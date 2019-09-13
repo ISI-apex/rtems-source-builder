@@ -126,9 +126,19 @@ def exists(paths):
     if type(paths) == list:
         results = []
         for p in paths:
-            results += [_exists(shell(p))]
+            try:
+                results += [_exists(shell(p))]
+            except OSError:
+                # Path may exist, but listdir in _exists will throw if
+                # permission is denied
+                results += [False]
         return results
-    return _exists(shell(paths))
+    try:
+        return _exists(shell(paths))
+    except OSError:
+        # Path may exist, but listdir in _exists will throw if
+        # permission is denied
+        return False
 
 def isdir(path):
     path = shell(path)
